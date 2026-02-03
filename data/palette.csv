@@ -1,0 +1,59 @@
+manual_annotation,manual_annotation_color,category,category_color
+Stem cells OLFM4+,#1f77b4,Stem,#C9EBFB
+Stem cells OLFM4+ LGR5+,#ff7f0e,Stem,#C9EBFB
+Stem cells MKI67+,#279e68,Stem,#C9EBFB
+Enterocytes BEST4+,#1f77b4,Enterocyte,#4a6fa5
+Enterocytes progenitor crypt OLFM4++,#ff7f0e,Enterocyte,#4a6fa5
+Enterocytes progenitor crypt OLFM4+,#279e68,Enterocyte,#4a6fa5
+Enterocytes progenitor crypt GPX2+,#d62728,Enterocyte,#4a6fa5
+Enterocytes precursor crypt KRT20++,#aa40fc,Enterocyte,#4a6fa5
+Enterocytes precursor crypt KRT20+,#f9c74f,Enterocyte,#4a6fa5
+Enterocytes bottom villus IFI27++,#9c89b8,Enterocyte,#4a6fa5
+Enterocytes bottom villus IFI27+,#b5bd61,Enterocyte,#4a6fa5
+Enterocytes mid villus IFI27++,#17becf,Enterocyte,#4a6fa5
+Enterocytes mid villus IFI27+,#98df8a,Enterocyte,#4a6fa5
+Enterocytes mid villus ALDOB+,#ffbb78,Enterocyte,#4a6fa5
+Enterocytes top villus,#aec7e8,Enterocyte,#4a6fa5
+Goblet cells BCAS1+,#1f77b4,Secretory,#3e92cc
+Goblet cells crypt MKI67+,#ff7f0e,Secretory,#3e92cc
+Goblet cells bottom villus,#279e68,Secretory,#3e92cc
+Goblet cells mid villus,#d62728,Secretory,#3e92cc
+Goblet cells top villus,#aa40fc,Secretory,#3e92cc
+Enteroendocrine cells,#f9c74f,Secretory,#3e92cc
+Enterochromaffin cells,#9c89b8,Secretory,#3e92cc
+Tuft cells,#b5bd61,Secretory,#3e92cc
+Monocytes S100A8/9+,#1f77b4,Myeloid,#f9c74f
+Monocytes SOD2+,#ff7f0e,Myeloid,#f9c74f
+Macrophages CCL3/4+ CXCL9/10+,#279e68,Myeloid,#f9c74f
+Macrophages ITGA4+,#d62728,Myeloid,#f9c74f
+Macrophages CD163++,#aa40fc,Myeloid,#f9c74f
+Macrophages CD163+,#f9c74f,Myeloid,#f9c74f
+cDC1,#9c89b8,Myeloid,#f9c74f
+pDCs/cDC2,#b5bd61,Myeloid,#f9c74f
+Mast cells,#17becf,Myeloid,#f9c74f
+T cells CD4+ memory,#1f77b4,T,#68b0ab
+T cells CD4+ memory CXCR6+,#ff7f0e,T,#68b0ab
+T cells CD4+ naive,#279e68,T,#68b0ab
+T cells CD4+ LEF1+,#d62728,T,#68b0ab
+T cells CD4+ PASK+,#aa40fc,T,#68b0ab
+T cells CD4+ Treg,#f9c74f,T,#68b0ab
+T cells CD4- CD8-,#9c89b8,T,#68b0ab
+T cells CD4- CD8- MBNL1+,#b5bd61,T,#68b0ab
+T cells CD8+ tissue-resident,#17becf,T,#68b0ab
+T cells CD8+ TRGC2+,#98df8a,T,#68b0ab
+T cells CD8+ GZMK+,#ffbb78,T,#68b0ab
+T cells gd,#aec7e8,T,#68b0ab
+ILCs,#ff9896,T,#68b0ab
+B cells,#1f77b4,B,#ce6a85
+B cells activated,#ff7f0e,B,#ce6a85
+B cells naive,#279e68,B,#ce6a85
+B cells memory FCRL2+,#d62728,B,#ce6a85
+B cells germinal centre/plasmablasts,#aa40fc,B,#ce6a85
+Plasma B cell XBP1/CD38++++,#1f77b4,Plasma,#e9724c
+Plasma B cell XBP1/CD38+++,#ff7f0e,Plasma,#e9724c
+Plasma B cell XBP1/CD38++,#279e68,Plasma,#e9724c
+Plasma B cell XBP1/CD38+,#d62728,Plasma,#e9724c
+Fibroblasts,#1f77b4,Mesenchymal,#de2d26
+Endothelial cells,#ff7f0e,Mesenchymal,#de2d26
+Pericyte cells,#279e68,Mesenchymal,#de2d26
+Colonocyte dummy,#825CA6,Colonocyte,#825CA6
