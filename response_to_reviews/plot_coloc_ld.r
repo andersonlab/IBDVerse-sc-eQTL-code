@@ -1,14 +1,24 @@
 # Bradley August 2025
 # Plot coloc plots, colour points by LD
 # module load HGI/softpack/users/bh18/Colocalisation_analysis/2
-# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000184384" "MAML2" "Myeloid_4_ti" "UC" "F"
-# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000172575" "RASGRP1" "Colonocyte_ct" "CD" "F"
-# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000145012" "LPP" "Secretory_r" "IBD" "F" # For Jingling
-# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000172575" "RASGRP1" "Colonocyte_ct" "CD" "T" "F" "F" # Plot the minres
-# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000136997" "MYC" "Epithelial_12_ct" "CD" "T" # Plot the minres
-# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000136997" "MYC" "Epithelial_12_ct" "CD" "F" # Don't plot the minres
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000184384" "MAML2" "Myeloid_4_ti" "UC"
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000172575" "RASGRP1" "Colonocyte_ct" "CD" 
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000136997" "MYC" "Epithelial_12_ct" "CD"  
+#
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000108175" "ZMIZ1" "T_r" "CD" 
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000162613" "FUBP1" "Colonocyte_r" "CD" 
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000101311" "FERMT1" "Secretory_ct" "IBD"  
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000137806" "NDUFAF1" "Secretory_ti" "UC" 
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000143801" "PSEN2" "Epithelial_3_r" "UC"  
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000143801" "PSEN2" "Epithelial_1_ti" "UC" #  (out of interest)
 
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000013561" "RNF14" "Epithelial_1_ti" "CD" "ses_cd_binned"
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000115232" "ITGA4" "Myeloid_blood" "IBD"
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000096968" "JAK2" "Epithelial_23_ct" "IBD"
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000163513" "TGFBR2" "Epithelial_5_ct" "IBD"
 
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000163513" "MOSPD3" "T_6_ct" "UC"
+# Rscript response_to_reviews/plot_coloc_ld.r "ENSG00000163513" "MOSPD3" "Enterocyte_ct" "UC"
 
 ################
 # Preamble
@@ -18,21 +28,29 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(patchwork))
+suppressPackageStartupMessages(library(viridisLite))
+suppressPackageStartupMessages(library(scales))
+# Truncate magma at orange
+pal <- viridisLite::magma(256)      # full palette
+pal_trunc <- pal[1:200]   
 
 
 # Options
 args = commandArgs(trailingOnly=TRUE)
-gene = args[1] # gene="ENSG00000172575"
-symbol = args[2] # symbol = "RASGRP1"
-condition = args[3] # condition="Colonocyte_ct"
+gene = args[1] # gene="ENSG00000162613"
+symbol = args[2] # symbol = "FUBP1"
+condition = args[3] # condition="Colonocyte_r"
 gwas_trait = args[4] # gwas_trait="CD"
-plot_minres = as.logical(args[5]) # plot_minres = T # Do you want some kind of annotation for the min res of variants?
-plot_minres_lines = as.logical(args[6]) # plot_minres_lines = F # Do you want the min res plotted as lines (TRUE)? Or as dots (FALSE)?
-plot_eqtl_count = as.logical(args[7]) # plot_eqtl_count = F # This will plot the position and number of eQTLs per resolution on top?
+if(length(args) == 5){
+  interaction = args[5] # interaction = "ses_cd_binned"
+} else {
+  interaction = NULL
+}
 print(paste0("~~~~~~ Plotting coloc between ", symbol, " and ", gwas_trait, " in ", condition))
 
 # Hard code paths and options
 sumstats.all.basedir <- '/lustre/scratch127/humgen/projects_v2/sc-eqtl-ibd/analysis/tobi_qtl_analysis/repos/nf-hgi_qtlight/2025_06_11-multi_tissue_base_results/TensorQTL_eQTLS/'
+sumstats.interaction.basedir <- '/lustre/scratch127/humgen/projects_v2/sc-eqtl-ibd/analysis/tobi_qtl_analysis/repos/nf-hgi_qtlight/2025_06_12-multi_tissue_interaction_results/TensorQTL_eQTLS/'
 gwas_dir <- "/lustre/scratch127/humgen/projects_v2/sc-eqtl-ibd/analysis/bradley_analysis/IBDverse/snakemake_coloc/gwas_sumstats_final/"
 gwas_master_list = paste0(gwas_dir, "gwas_files.txt")
 clump_file = "data/clumped_all.txt.gz"
@@ -42,6 +60,7 @@ annotation_file = "data/all_IBDverse_annotation_mastersheet.csv"
 out = "response_to_reviews/coloc_plots"
 gene_pos_f = "data/gene_counts_Ensembl_105_phenotype_metadata.annotation_file.txt"
 coloc_dir = '/lustre/scratch127/humgen/projects_v2/sc-eqtl-ibd/analysis/bradley_analysis/IBDverse/snakemake_coloc/results/2025_06_11_IBDverse_coloc_all_gwas/collapsed/'
+int_coloc_dir = '/lustre/scratch127/humgen/projects_v2/sc-eqtl-ibd/analysis/tobi_qtl_analysis/results/coloc/IBDverse-multi_tissue_interaction_2025/collapsed/'
 tempout = "temp/coloc"
 eqtl_minres_map = "eqtl_out/eQTL_minres_map.txt.gz"
 eQTL_count_map = "eqtl_out/eQTL_count_map.txt.gz"
@@ -50,19 +69,43 @@ for(dir in c(out, tempout)){
         dir.create(dir)
     }
 }
-annot.class.palette <- c('Tissue'='#edf8b1',
-                         'All Cells'='#edf8b1',
-                         'Major category'='#7fcdbb',
-                         'Major population'='#7fcdbb',
-                         'Cell type'='#2c7fb8',
-                         'ieQTL' = '#DB8CD7')
+annot.class.palette <- c('All Cells'='#edf8b1',
+                         'Major pop.'='#7fcdbb',
+                         'Cell type'='#2c7fb8')
+
+interaction_name_convert = data.frame(
+  raw = c("age_binned", "ses_cd_binned", "ses_inflamed", "sex", "smoking_ever"),
+  formatted = c("Age", "Inflam. status\n(binned)", "Inflam. status", "Sex", "Smoker")
+)
+
+# Define variables based on whether interaction or base
+if(is.null(interaction)){
+  eqtl_sumstatpath = paste0(sumstats.all.basedir, "dMean__", condition, "_all/OPTIM_pcs/base_output/base/")
+  eqtlf = paste0(eqtl_sumstatpath, "Cis_eqtls_qval.tsv")
+  nom_pval_col = "pval_nominal"
+  coloc_path = paste0(coloc_dir, gwas_trait, ".gz")
+  condition_name_format = paste0("dMean__", condition, "_all")
+  outf=paste0(out, "/", gene, "-", symbol, "-", condition, "-", gwas_trait, "_manhattan-", "eQTL_minres", ".png")
+} else {
+  eqtl_sumstatpath = paste0(sumstats.interaction.basedir, "dMean__", condition, "_all/OPTIM_pcs/interaction_output/", interaction, "/")
+  eqtlf = paste0(eqtl_sumstatpath, "cis_inter1.cis_qtl_top_assoc.txt.gz")
+  nom_pval_col = "pval_gi"
+  coloc_path = paste0(int_coloc_dir, gwas_trait, ".gz")
+  condition_name_format = paste0("dMean__", condition, "_all__", interaction)
+  niceintname = interaction_name_convert %>% 
+    filter(raw == !!interaction) %>% 
+    pull(formatted)
+  annot.class.palette = c(annot.class.palette, 'ieQTL' = '#f8b1f1ff')
+  outf=paste0(out, "/", gene, "-", symbol, "-", condition, "-", interaction, "-", gwas_trait, "_manhattan-", "eQTL_minres", ".png")
+}
+
 
 ############
 # Get gwas and QTL sumstats
 ############
 ## eQTL
 # Lead
-eqtlf = paste0(sumstats.all.basedir, "dMean__", condition, "_all/OPTIM_pcs/base_output/base/Cis_eqtls_qval.tsv")
+print("..Loading the eQTL sumstats")
 eqtl_q = fread(eqtlf) 
 eqtl_q_want = eqtl_q %>% 
     filter(phenotype_id == !!gene)
@@ -75,9 +118,14 @@ leadpos = as.numeric(split_lead[2])
 min=max(0,leadpos-window)
 max=leadpos+window
 
+if(is.null(interaction)){
+  eqtlnom = paste0(eqtl_sumstatpath, "cis_nominal1.cis_qtl_pairs.", chrnum, ".tsv")
+} else {
+  eqtlnom = paste0(eqtl_sumstatpath, "cis_inter1.cis_qtl_pairs.", chrnum, ".tsv")
+}
+
+
 # Nominal
-print("..Loading the eQTL sumstats")
-eqtlnom = paste0(sumstats.all.basedir, "dMean__", condition, "_all/OPTIM_pcs/base_output/base/cis_nominal1.cis_qtl_pairs.", chrnum, ".tsv")
 eqtl = fread(eqtlnom) %>% 
     rowwise() %>% 
     mutate(pos = as.numeric(unlist(strsplit(variant_id, "\\:"))[c(F,T,F,F)])) %>% 
@@ -104,6 +152,7 @@ gwas = fread(gwasf) %>%
     )
 
 gwas_lead = gwas %>% 
+    filter(RSid %in% eqtl$variant_id) %>% 
     slice_min(pval) %>% 
     pull(RSid)
 
@@ -158,7 +207,8 @@ gwas_ld = read.delim(paste0(tempout, "/", gene, "-", condition, "-GWAS-LD.ld"), 
 # Combine
 print("..Putting all together")
 both = eqtl %>% 
-    select(variant_id, pval_nominal, pos) %>%
+    select(variant_id, !!nom_pval_col, pos) %>%
+    rename(pval_nominal = !!nom_pval_col) %>% 
     left_join(eqtl_ld) %>% 
     rowwise() %>% 
     mutate(
@@ -203,11 +253,11 @@ if(grepl("_", condition_no_tissue)){
                         pull(label_new),
                     " (", nicetissue, ")")
 } else {
-    nicename = paste0(condition_no_tissue, " major population", " (", nicetissue, ")")
+    nicename = paste0(condition_no_tissue, " Major Pop.", " (", nicetissue, ")")
 }
 
 # Add new line if too long
-wrap_nicename <- function(txt, width = 28) {
+wrap_nicename <- function(txt, width = 40) {
   if (nchar(txt) <= width) return(txt)
   
   # find spaces before the cutoff
@@ -221,6 +271,7 @@ wrap_nicename <- function(txt, width = 28) {
   )
 }
 nicename = wrap_nicename(nicename) # Put on two seperate lines if too long
+nicename = gsub("CAECAM", "CEACAM", nicename)
 
 # Annotate variants in the other clumps by their minimum res
 minres = read.delim(eqtl_minres_map) %>% 
@@ -231,10 +282,18 @@ minres = read.delim(eqtl_minres_map) %>%
   ) %>%
   select(qtl_clump_index, annotation_type)
 
+# Exclude ieQTLs if not working with interaction
+if(is.null(interaction)){
+  minres = minres %>%
+    filter(annotation_type != "ieQTL")
+}
+
 min_var_per_clump = read.delim(clump_file) %>% 
     filter(phenotype_id == !!gene) %>% 
     left_join(minres) %>% 
-    left_join(eqtl) %>% 
+    left_join(eqtl %>% 
+      rename(pval_nominal = !!nom_pval_col)) %>% 
+    filter(!is.na(pval_nominal)) %>%
     group_by(qtl_clump_index) %>% 
     slice_min(pval_nominal, with_ties=F) %>%
     ungroup()
@@ -244,10 +303,13 @@ both = both %>%
     min_var_per_clump %>% 
       select(variant_id, annotation_type)
     )
-  
+
+# Replace the resolutions to use abbreviation
+both$annotation_type = gsub("Major population", "Major pop.", both$annotation_type)
+
 # Make sure annotation_type for GWAS is NA
 both$annotation_type = ifelse(both$type == "GWAS", NA, both$annotation_type)
-both$annotation_type = factor(both$annotation_type, levels=c("All Cells", "Major population", "Cell type", "ieQTL"))
+both$annotation_type = factor(both$annotation_type, levels=names(annot.class.palette))
 both$index = !is.na(both$annotation_type)
 
 
@@ -256,132 +318,94 @@ both = both %>%
     filter(!is.na(r2_lead))
 
 # Define annotations
-coloc_stat = fread(paste0(coloc_dir, gwas_trait, ".gz")) %>%
+coloc_stat = fread(coloc_path) %>%
     filter(
         phenotype_id == !!gene,
-        condition_name == paste0("dMean__", condition, "_all")
+        condition_name == !!condition_name_format
     ) %>% 
     pull(PP.H4.abf)
 
-qtllab <- paste0(nicename, "\n", symbol)
-num_qtllab_lines = length(gregexpr("\n", qtllab)[[1]])
-qtllab_just = 0.90-(0.1*num_qtllab_lines)
+if(is.null(interaction)){
+  qtllab <- paste0("italic('", symbol, "')~'eQTL'")
+} else {
+  qtllab <- paste0("italic('", symbol, "')~'ieQTL'")
+}
 gwaslab = paste0(gwas_trait, " GWAS\nPP.H4=", sprintf("%.2f", coloc_stat))
 
 # Tidy the temp files
 print("..Cleaning temp files")
 system(sprintf('rm %s ', paste0(tempout, "/", gene, "*")))
 
+# Create flag for the eQTL lead
+both = both %>%
+  mutate(is_eqtl_lead = type == "eQTL" & is_lead)
+
+# For the plotting of lead with seperate colour, need to discretise these
+both = both %>% mutate(
+    # Create bins for r2_lead (adjust breaks as needed)
+    r2_binned = cut(r2_lead, breaks = seq(0, 1, 0.2), include.lowest = TRUE),
+    
+    # Create combined variable for coloring
+    color_var = ifelse(is_eqtl_lead, 
+                      as.character(annotation_type),
+                      as.character(r2_binned))
+  )
+
+r2_breaks <- seq(0, 1, 0.2)
+r2_colors <- pal_trunc[seq(1, length(pal_trunc), length.out = length(r2_breaks)-1)]
+names(r2_colors) <- paste0(levels(cut(r2_breaks, breaks = r2_breaks)))
+combined_palette <- c(r2_colors, annot.class.palette)
+
+# Format these (make nice and relevel)
+names(combined_palette) = gsub("\\(", "", names(combined_palette))
+names(combined_palette) = gsub("\\[", "", names(combined_palette))
+names(combined_palette) = gsub("\\]", "", names(combined_palette))
+names(combined_palette) = gsub("\\,", " - ", names(combined_palette))
+both$color_var = gsub("\\(", "", both$color_var)
+both$color_var = gsub("\\[", "", both$color_var)
+both$color_var = gsub("\\]", "", both$color_var)
+both$color_var = gsub("\\,", " - ", both$color_var)
+both$color_var = factor(both$color_var, levels=c(c("0.8 - 1", "0.6 - 0.8", "0.4 - 0.6", "0.2 - 0.4", "0 - 0.2", names(annot.class.palette))))
+
+# Make sure all anotation type values are plotted:
+both$annotation_type <- factor(both$annotation_type, levels = names(annot.class.palette))
+
+# Make a dummy for the colour legend (plot behind the left-most point)
+mineqtlpos = both %>%
+  filter(type == "eQTL") %>% 
+  arrange(pos) %>% 
+  head(n=1)
+
+legend_data_col <- data.frame(
+  annotation_type = names(annot.class.palette),
+  type = "eQTL",
+  logpval = mineqtlpos$logpval,
+  pos=mineqtlpos$pos
+)
+
+
+# Do the same for the LD
+mingwaspos = both %>%
+  filter(type == "GWAS") %>% 
+  arrange(pos) %>% 
+  head(n=1)
+
+legend_data_fill <- data.frame(
+  color_var = c("0.8 - 1", "0.6 - 0.8", "0.4 - 0.6", "0.2 - 0.4", "0 - 0.2"),
+  type="GWAS",
+  logpval=mingwaspos$logpval,
+  pos=mingwaspos$pos
+)
+legend_data_fill$color_var = factor(legend_data_fill$color_var, levels = c("0.8 - 1", "0.6 - 0.8", "0.4 - 0.6", "0.2 - 0.4", "0 - 0.2"))
+# Reorder palette
+ldcols = rev(combined_palette[grep("\\-", names(combined_palette))])
+rescols = combined_palette[-grep("\\-", names(combined_palette))]
+combined_palette = c(ldcols, rescols)
+
 ############
 # Plot
 ############
 print("..Plotting")
-# Define fname and plot
-if(plot_minres){
-  outf=paste0(out, "/", gene, "-", symbol, "-", condition, "-", gwas_trait, "_manhattan-", "eQTL_minres", ".png")
-
-  # Plot
-  scatter_plot = ggplot(both, aes(x = pos, y = logpval)) +
-  geom_point(
-    aes(fill = r2_lead, shape = is_lead),
-    color = "transparent", size = 3, stroke = 1
-  ) +
-  geom_point(
-      data = subset(both, is_lead),
-      aes(fill = r2_lead, shape = is_lead),
-      color = "black", size = 3, stroke = 1.5
-    ) +
-  scale_fill_gradient(low = "lightgrey", high = "darkorange2") +
-  scale_shape_manual(values = c(`FALSE` = 21, `TRUE` = 23), guide = "none")
-
-  if(plot_minres_lines){
-    vline_data <- both %>% 
-      filter(!is.na(annotation_type)) %>%
-      select(pos, annotation_type) %>%
-      distinct()
-
-    scatter_plot = scatter_plot + 
-      geom_vline(data = vline_data, 
-             aes(xintercept = pos, color = annotation_type), linewidth=1, lty="dashed") +
-      scale_color_manual(values=annot.class.palette, name = "Granularity/type")
-  } else {
-    scatter_plot = scatter_plot + 
-      geom_point(
-        data = subset(both, index),
-        aes(fill = r2_lead, shape = is_lead, color = annotation_type),
-        size = 3, stroke = 1.5
-      ) +
-      scale_color_manual(values=annot.class.palette, name = "Granularity/type") +
-      guides(color = guide_legend(override.aes = list(shape = 21, fill = "white", size = 3)))
-  }
-
-  scatter_plot = scatter_plot +
-    geom_point(
-      data = subset(both, is_lead),
-      aes(fill = r2_lead, shape = is_lead),
-      color = "black", size = 3, stroke = 1.5
-    ) # Make sure the lead is black
-
-} else {
-  outf=paste0(out, "/", gene, "-", symbol, "-", condition, "-", gwas_trait, "_manhattan.png")
-
-  # Plot
-  scatter_plot = ggplot(both, aes(x = pos, y = logpval)) +
-    geom_point(
-      aes(fill = r2_lead, shape = is_lead),
-      color = "transparent", size = 3, stroke = 1
-    ) +
-    geom_point(
-      data = subset(both, index),
-      aes(fill = r2_lead, shape = is_lead),
-      color = "darkorange", size = 3, stroke = 1
-    ) +
-    geom_point(
-      data = subset(both, is_lead),
-      aes(fill = r2_lead, shape = is_lead),
-      color = "black", size = 3, stroke = 1
-    ) +
-    scale_fill_viridis_c() +
-    scale_shape_manual(values = c(`FALSE` = 21, `TRUE` = 23), guide = "none") 
-}
-
-scatter_plot = scatter_plot + 
-  facet_grid(type ~ ., labeller = label_value, scales = "free_y") +
-  theme_classic() +
-  theme(
-    strip.text.y = element_blank(),
-    strip.background = element_blank()
-  ) +
-  scale_x_continuous(
-    labels = function(x) sprintf("%.1f", x / 1e6),
-    limits = c(min,max)
-  ) + 
-  geom_text(
-    data = data.frame(
-      type = unique(both$type),
-      pos = min(both$pos),
-      logpval = c(
-        max(both %>% filter(type == "eQTL") %>% pull(logpval)) * qtllab_just, 
-        max(both %>% filter(type == "GWAS") %>% pull(logpval) * 0.85)
-        ),
-      label = c(qtllab, gwaslab)
-    ),
-    aes(x = pos, y = logpval, label = label),
-    inherit.aes = FALSE, hjust = 0, vjust = 0, size=4.5
-  ) + 
-  labs(
-    x=paste0("Chromosome ", chrnum, " position (Mb)"),
-    y=expression(-log[10](p-value)),
-    fill = "r²"
-  ) + 
-  theme(
-    axis.text.x  = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.title.x = element_blank(),
-    axis.text.y = element_text(size=12),
-    axis.title.y = element_text(size=13),
-    plot.margin = margin(t = 5, r = 5, b = 0, l = 5)
-  )
 
 # Define the gene packing function
 pack_intervals <- function(df) {
@@ -429,7 +453,8 @@ gene_df <- read.delim(gene_pos_f) %>%
   rowwise() %>%
   mutate(
     want = feature_id == !!gene,
-    label = ifelse(want, !!symbol, "")
+    label = ifelse(want, !!symbol, ""),
+    label = ifelse(label != "", paste0("italic('", label, "')"), "")
   )
 
 # Plot the gene positions
@@ -439,13 +464,13 @@ gene_plot <- ggplot(gene_df) +
         y = row, yend = row,
         color = want),
     arrow = arrow(length = unit(0.15, "cm"), type = "closed"),
-    size = 1.2
+    size = 1.7
   ) +
   geom_text(data = gene_df,
             aes(x = (start + end)/2, y = row+0.4, label = label),
-            inherit.aes = FALSE, hjust = 0, size = 4, color="darkorange2") +
+            inherit.aes = FALSE, hjust = 0, size = 6, color="darkorange2", parse=T) +
   scale_color_manual(
-    values = c(`TRUE` = "darkorange2", `FALSE` = "lightgrey"),
+    values = c(`TRUE` = "darkorange2", `FALSE` = "black"),
     guide = "none"
   ) + 
   labs(x = paste0("Chromosome ", chrnum, " position (Mb)"),
@@ -454,72 +479,193 @@ gene_plot <- ggplot(gene_df) +
   theme_classic() +
   scale_x_continuous(
     labels = function(x) sprintf("%.1f", x / 1e6),
-    limits = c(min,max)
+    limits = c(min,max),
+    expand = c(0.02, 0.02)
   ) +
   theme(
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
     axis.line.y = element_blank(),
     axis.title.y = element_blank(),
-    axis.text.x = element_text(size=12),
-    axis.title.x = element_text(size=13)
+    axis.text.x = element_text(size=18),
+    axis.title.x = element_text(size=20)
   )
 
-if(plot_minres_lines){
-  gene_plot <- gene_plot +
-    geom_vline(data = vline_data,
-               aes(xintercept = pos, color = annotation_type),
-               linewidth = 1, lty = "dashed") +
-    scale_color_manual(values = annot.class.palette, guide = "none") +
-    scale_color_manual(
-      values = c(`TRUE` = "darkorange2", `FALSE` = "black"),
-      guide = "none"
-    ) # Hide legend on gene_plot
-}
-
-# Construct the NeQTL per res fig
-plot_variants = both %>% 
-  filter(!is.na(annotation_type)) %>%
-  distinct(variant_id, pos, annotation_type) %>% 
-  left_join(
-    read.delim(clump_file) %>%
-      filter(phenotype_id == !!gene)
-  ) 
-
-eqtl_count = read.delim(eQTL_count_map) %>%
-      filter(grepl(!!gene, phenotype_clump_index)) %>%
-      rename(qtl_clump_index = "phenotype_clump_index") %>%
-      mutate(qtl_clump_index = unlist(strsplit(qtl_clump_index, "\\-"))[c(F,T)]) %>%
-      left_join(
-        plot_variants %>% 
-          select(qtl_clump_index, pos)
-      ) %>%
-      mutate(annotation_type = factor(annotation_type, levels = c("Cell type", "Major population", "All Cells", "ieQTL")))
-  
-eqtl_count_plot = ggplot(eqtl_count, aes(x = pos, y = annotation_type)) + 
-  geom_tile(aes(fill = count), width = 15000, height = 1, color="black") +
-  scale_fill_viridis_c(limits=c(0, max(eqtl_count$count)), name="Number of\nannotations") +  
-  theme_classic() +
-  labs(x = "Position", y = "", fill = "Count") + 
-  scale_x_continuous(limits = c(min,max)) + 
+# Make top plot (eQTL)
+topdat = both %>% filter(type == "eQTL")
+top = ggplot(topdat, aes(x = pos, y = logpval)) +
+  geom_point(data = legend_data_col, # Plot the dummy first
+          aes(pos, logpval, colour = annotation_type)) +
+  geom_point( # Plot the points for non-leads, coloured by LD
+    data = topdat %>% filter(!is_eqtl_lead),
+    aes(fill = color_var, shape = is_lead),
+    color = "transparent", size = 3, stroke = 1
+  ) +
+  geom_point( # Plot the leads with black outline
+    data = topdat %>% filter(is_lead),
+    aes(fill = color_var, shape = is_lead),
+    color = "black", size = 4, stroke = 1.5
+  ) +
+  scale_fill_manual(values = combined_palette,
+    breaks = names(combined_palette)[grep("\\-", names(combined_palette))],
+  ) + 
+  scale_shape_manual(values = c(`FALSE` = 21, `TRUE` = 23), guide = "none") + 
+  geom_point(
+      data = topdat %>% filter(index, !is_eqtl_lead),
+      aes(fill = color_var, shape = is_lead, color = annotation_type),
+      size = 3, stroke = 2
+    ) +
+  scale_color_manual(
+    values=annot.class.palette, 
+    name = "Resolution", 
+    breaks = names(annot.class.palette),
+    drop=F
+  ) +
+  guides(
+    color = "none",
+    fill = guide_legend(
+      title = "r²",
+      override.aes = list(
+        shape = 21, 
+        color = "transparent",
+        size = 5
+      ),
+      title.theme = element_text(size = 19),
+      label.theme = element_text(size = 16)
+    )
+  ) + 
+  theme_classic() + 
   theme(
-    axis.text.x  = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.title.x = element_blank(),
-    axis.text.y = element_text(size=12),
-    axis.title.y = element_blank()
+      legend.position = c(0.95, 1.025),     # top-right inside panel
+      legend.justification = c("right","top"),
+      strip.text.y = element_blank(),
+      strip.background = element_blank(),
+      axis.text.x  = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      axis.text.y = element_text(size=19),
+      axis.title.y = element_text(size=21),
+      plot.margin = margin(t = 5, r = 5, b = 0, l = 5),
+      axis.line.x = element_blank(),
+      title = element_text(size=18)
+  ) +
+  scale_x_continuous(
+    labels = function(x) sprintf("%.1f", x / 1e6),
+    limits = c(min,max),
+    expand = c(0.02, 0.02)
+  ) + 
+  geom_text(
+    data = data.frame(
+      type = "eQTL",
+      pos = both %>% filter(type == "eQTL") %>% pull(pos) %>% min(),
+      logpval = both %>% filter(type == "eQTL") %>% pull(logpval) %>% max()*0.95,
+      label = c(qtllab)
+    ),
+    aes(x = pos, y = logpval, label = label),
+    inherit.aes = FALSE, hjust = 0, vjust = 0, size=7, parse=TRUE
+  ) + 
+  labs(
+    x=paste0("Chromosome ", chrnum, " position (Mb)"),
+    y=expression(-log[10](p-value)),
+    fill = "r²",
+    title = nicename
   )
 
-# Combine
-if(plot_eqtl_count){
-  eqtl_count_plot / scatter_plot / gene_plot +
-  plot_layout(heights = c(0.8, 3, 0.5), guides = "collect")   
-} else {
-  scatter_plot / gene_plot +
-  plot_layout(heights = c(3, 0.5))   
+# Plot extra annotation 
+if(!is.null(interaction)){
+  top = top +  
+    geom_text(
+      data = data.frame(
+        type = "eQTL",
+        pos = both %>% filter(type == "eQTL") %>% pull(pos) %>% min(),
+        logpval = both %>% filter(type == "eQTL") %>% pull(logpval) %>% max()*0.68,
+        label = c(niceintname)
+      ),
+      aes(x = pos, y = logpval, label = label),
+      inherit.aes = FALSE, hjust = 0, vjust = 0, size=7
+    ) 
 }
 
+midat = both %>% filter(type == "GWAS")
+middle = ggplot(midat, aes(x = pos, y = logpval)) +
+  geom_point(data = legend_data_fill, # Plot the dummy first
+          aes(pos, logpval, fill = color_var)) +
+  geom_point( # Plot the points for non-leads, coloured by LD
+    data = midat %>% filter(!is_eqtl_lead),
+    aes(fill = color_var, shape = is_lead),
+    color = "transparent", size = 3, stroke = 1
+  ) +
+  geom_point( # Plot the leads with black outline
+    data = midat %>% filter(is_lead),
+    aes(fill = color_var, shape = is_lead),
+    color = "black", size = 4, stroke = 1.5
+  ) +
+  scale_fill_manual(values = combined_palette,
+  breaks = names(combined_palette)[grep("\\-", names(combined_palette))],
+  ) + 
+  scale_shape_manual(values = c(`FALSE` = 21, `TRUE` = 23), guide = "none") + 
+  geom_point(
+      data = midat %>% filter(index, !is_eqtl_lead),
+      aes(fill = color_var, shape = is_lead, color = annotation_type),
+      size = 3, stroke = 2
+    ) +
+  scale_color_manual(
+    values=annot.class.palette, 
+    name = "Resolution", 
+    breaks = names(annot.class.palette),
+    drop=F
+  ) +
+  guides(
+    fill = "none",
+    color = guide_legend(
+      title = "Resolution",
+      override.aes = list(
+        shape = 21, 
+        fill = "white", 
+        size = 5,         
+        stroke = 2
+      ),
+      title.theme = element_text(size = 19),      
+      label.theme = element_text(size = 16)       
+    )
+  ) + 
+  theme_classic() + 
+  theme(
+      legend.position = c(0.95, 1.025),     # top-right inside panel
+      legend.justification = c("right","top"),
+      strip.text.y = element_blank(),
+      strip.background = element_blank(),
+      axis.text.x  = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.text.y = element_text(size=19),
+      axis.title.y = element_text(size=21),
+      plot.margin = margin(t = 5, r = 5, b = 0, l = 5)
+  ) +
+  scale_x_continuous( 
+    labels = function(x) sprintf("%.1f", x / 1e6),
+    limits = c(min,max),
+    expand = c(0.02, 0.02)
+  ) + 
+  geom_text(
+    data = data.frame(
+      type = "GWAS",
+      pos = both %>% filter(type == "GWAS") %>% pull(pos) %>% min(),
+      logpval = both %>% filter(type == "GWAS") %>% pull(logpval) %>% max() * 0.82,
+      label = c(gwaslab)
+    ),
+    aes(x = pos, y = logpval, label = label),
+    inherit.aes = FALSE, hjust = 0, vjust = 0, size=7
+  ) + 
+  labs(
+    x=paste0("Chromosome ", chrnum, " position (Mb)"),
+    y=expression(-log[10](p-value)),
+    fill = "r²"
+  )
 
-ggsave(outf, width = 10, height = 7.5)
+top / middle / gene_plot +
+  plot_layout(axes = "collect", heights = c(1.5, 1.5, 0.5))   
+
+ggsave(outf, width = 8.5, height = 8.5)
 print("..DONE!")
-
