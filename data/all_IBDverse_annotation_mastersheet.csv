@@ -35,7 +35,7 @@ Epithelial_26,Enterendocrine (2),Secretory,Epithelial,Epithelial,,Colon ileum en
 Epithelial_27,Goblet crypt,Secretory,Epithelial,Epithelial,,Colon goblet ATOH1+ MUC2 low,,,
 Epithelial_28,Goblet cells crypt MKI67+,Secretory,Epithelial,Epithelial,,Ileum goblet MKI67+,,,
 Epithelial_29,Enterocyte BEST4+ ,Enterocyte,Epithelial,Epithelial,,Enterocyte BEST4+,,,
-Epithelial_3,Colonocyte (2),Colonocyte,Epithelial,Epithelial,,Colonocyte CAECAM7+ KRT20+ IFI27+,,,
+Epithelial_3,Colonocyte (2),Colonocyte,Epithelial,Epithelial,,Colonocyte CEACAM7+ KRT20+ IFI27+,,,
 Epithelial_30,Enterocyte mid villus ALDOB+,Enterocyte,Epithelial,Epithelial,,Enterocyte mid villus ALDOB+,,,
 Epithelial_31,Paneth,Secretory,Epithelial,Epithelial,,Ileum paneth DEFA6,,,
 Epithelial_32,Rectal Goblet (2),Secretory,Epithelial,Epithelial,,Colon goblet MUC2++ BCAS1+,,,
