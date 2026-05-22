@@ -67,7 +67,7 @@ Myeloid_1,Myeloid_1,Myeloid,Myeloid,Immune,,Intermediate monocyte,,,
 Myeloid_10,Macrophage ITGA4+ (1) ,Myeloid,Myeloid,Immune,,CCL3/CCL4 CXCL9/10 Macrophage,,This likely includes the SOD2+ monocyte population from the TI atlas,
 Myeloid_11,Plasma Dendritic cells,Myeloid,Myeloid,Immune,,pDC,,,
 Myeloid_12,Mono/B,Myeloid,Myeloid,Immune,Plot myeloid cells with B cell markers genes,Blood S100A8 mid CD14 mid BANK1+,,"These look like B cells - BANK1, FCRL1, MS4A1, CD79A, IGHM",Q: On what basis is this a myeloid cell? Does it express CSF1R? MAF? ITGAM?
-Myeloid_14,Myeloid_14,Myeloid,Myeloid,Immune,,Macrophage proliferating,C1QA/B/C SELENOP+ CD163+ Ki67+,,
+Myeloid_14,Myeloid_14,Myeloid,Myeloid,Immune,,Macrophage proliferating,C1QA/B/C SELENOP+ CD163+ MKI67+,,
 Myeloid_15,Intermediate monocyte (1),Myeloid,Myeloid,Immune,"Could be a metabolically active intermediate/classical monocyte, or just less healthy, is this found preferentially in disease?",Blood MALAT1+ CD14 mid CD16- CSF1R low,,Expresses TSIX? anti-sense to XIST? loads of lncRNA? ,Q: On what basis is this a myeloid cell? Does it express CSF1R? MAF? ITGAM?
 Myeloid_16,Conventional dendritic cells 1 (2),Myeloid,Myeloid,Immune,,cDC1,,,
 Myeloid_17,Intermediate monocyte (2),Myeloid,Myeloid,Immune,,Macrophage MMP9+,MMP9++ S100A8/9mid ,,
