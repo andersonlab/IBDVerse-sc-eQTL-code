@@ -79,7 +79,7 @@ Myeloid_7,Intermediate monocyte SOD2+,Myeloid,Myeloid,Immune,,Monocyte S100A8/9+
 Myeloid_8,Conventional dendritic cells 2,Myeloid,Myeloid,Immune,,cDC2,,,
 Myeloid_9,Conventional dendritic cells 1 (1),Myeloid,Myeloid,Immune,"DC+mo-mac gene list dot plot comparing 8,9,11,16",Bin for low quality tissue cDC1 and cDC2,,I think these are low quality DCs and should remove,
 Platelet,Platelet,Myeloid,Platelet,Immune,,Platelet,,,
-T_0,T_0,T,T,Immune,,CD4+ CM/Naive,"SELL+, CD4+",,
+T_0,T_0,T,T,Immune,,CD4+ CM/naive,"SELL+, CD4+",,
 T_1,CD4 central memory T cells,T,T,Immune,,CD4+ CM,,,
 T_10,T_10,T,T,Immune,,GD T KLRG1+,TRGC2+. TRDC+,,
 T_11,CD4 tissue resident memory T cells 1 (1),T,T,Immune,,CD4+ memory 2,MALAT1+,Are there any other QC? 3v11 comparision,
