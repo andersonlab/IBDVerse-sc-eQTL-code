@@ -32,7 +32,7 @@ Epithelial_23,Enterendocrine (1),Secretory,Epithelial,Epithelial,,Enteroendocrin
 Epithelial_24,Rectal TA (4),Colonocyte,Epithelial,Epithelial,,Colon progenitor OLFM4+ MKI67+,,,
 Epithelial_25,Intestinal TA (2),Enterocyte,Epithelial,Epithelial,,Enterocyte progenitor/precursor crypt OLFM4++,,,
 Epithelial_26,Enterendocrine (2),Secretory,Epithelial,Epithelial,,Colon ileum enterochromaffin TPH1 CES1+,,,
-Epithelial_27,Goblet crypt,Secretory,Epithelial,Epithelial,,Colon goblet ATOH1 MUC2 low,,,
+Epithelial_27,Goblet crypt,Secretory,Epithelial,Epithelial,,Colon goblet ATOH1+ MUC2 low,,,
 Epithelial_28,Goblet cells crypt MKI67+,Secretory,Epithelial,Epithelial,,Ileum goblet MKI67+,,,
 Epithelial_29,Enterocyte BEST4+ ,Enterocyte,Epithelial,Epithelial,,Enterocyte BEST4+,,,
 Epithelial_3,Colonocyte (2),Colonocyte,Epithelial,Epithelial,,Colonocyte CAECAM7+ KRT20+ IFI27+,,,
