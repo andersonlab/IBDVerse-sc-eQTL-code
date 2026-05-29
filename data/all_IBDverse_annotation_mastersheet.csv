@@ -1,4 +1,4 @@
-leiden,Category,Clustering_category,Lineage,Cell_type,Evidence,
+leiden,Category,Clustering_category,Lineage,Cell_type,Evidence
 B_0,B,B,B,Naive B,IGHD+,
 B_1,Plasma,B,B,Plasma B CD38int,,
 B_10,B,B,B,Atypical B,"FCRL2+, ITGAX+, TBX21",
@@ -66,15 +66,15 @@ Myeloid_0,Myeloid,Myeloid,Immune,Classical monocyte,,
 Myeloid_1,Myeloid,Myeloid,Immune,Intermediate monocyte,,
 Myeloid_10,Myeloid,Myeloid,Immune,Macrophage CCL3/4 CXCL9/10,,
 Myeloid_11,Myeloid,Myeloid,Immune,pDC,,
-Myeloid_12,Myeloid,Myeloid,Immune,Blood S100A8 mid CD14 mid BANK1,,Q: On what basis is this a myeloid cell? Does it express CSF1R? MAF? ITGAM?
+Myeloid_12,Myeloid,Myeloid,Immune,Blood S100A8 mid CD14 mid BANK1,,
 Myeloid_14,Myeloid,Myeloid,Immune,Macrophage proliferating,C1QA/B/C SELENOP+ CD163+ MKI67+,
-Myeloid_15,Myeloid,Myeloid,Immune,Blood MALAT1+ CD14 mid CD16- CSF1R low,,Q: On what basis is this a myeloid cell? Does it express CSF1R? MAF? ITGAM?
+Myeloid_15,Myeloid,Myeloid,Immune,Blood MALAT1+ CD14 mid CD16- CSF1R low,,
 Myeloid_16,Myeloid,Myeloid,Immune,cDC1,,
 Myeloid_17,Myeloid,Myeloid,Immune,Macrophage MMP9,MMP9++ S100A8/9mid ,
 Myeloid_2,Myeloid,Myeloid,Immune,Macrophage CD163lo,C1QA/B/C SELENOP+ CD163+,
 Myeloid_3,Myeloid,Myeloid,Immune,Non-classical monocyte,,
 Myeloid_4,Myeloid,Myeloid,Immune,Macrophage CD163hi,C1QA/B/C SELENOP+ CD163++,
-Myeloid_5,Myeloid,Myeloid,Immune,Blood S100A8 mid CD14 mid CD247+,,Q: On what basis is this a myeloid cell? Does it express CSF1R? MAF? ITGAM?
+Myeloid_5,Myeloid,Myeloid,Immune,Blood S100A8 mid CD14 mid CD247+,,
 Myeloid_7,Myeloid,Myeloid,Immune,Monocyte S100A8/9,,
 Myeloid_8,Myeloid,Myeloid,Immune,cDC2,,
 Myeloid_9,Myeloid,Myeloid,Immune,Bin for low quality tissue cDC1 and cDC2,,
